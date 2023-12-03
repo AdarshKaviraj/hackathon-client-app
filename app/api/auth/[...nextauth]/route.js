@@ -1,7 +1,7 @@
 import NextAuth from 'next-auth';
 import GitHubProvider from 'next-auth/providers/github';
 
-export default NextAuth({
+export const authOptions = {
   providers: [
     GitHubProvider({
       clientId: process.env.GITHUB_CLIENT_ID,
@@ -10,6 +10,16 @@ export default NextAuth({
         params: {
           scope: 'read:user, repo', // Adjust scopes as needed
         },
+      },
+      async profile(profile, tokens) {
+        return {
+          id: profile.id,
+          name: profile.login,
+          email: profile.email,
+          image: profile.avatar_url,
+          accessToken: tokens.access_token,
+          refreshToken: tokens.refresh_token,
+        };
       },
     }),
   ],
@@ -20,6 +30,7 @@ export default NextAuth({
     async jwt({ token, account }) {
       if (account) {
         token.accessToken = account.access_token;
+        // token.name = account.login;
       }
       return token;
     },
@@ -28,4 +39,8 @@ export default NextAuth({
       return session;
     },
   },
-});
+};
+
+const handler = NextAuth(authOptions);
+
+export { handler as GET, handler as POST };
