@@ -1,15 +1,9 @@
 // pages/api/github/repos.js
-import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from 'next-auth/react';
-import { Octokit } from '@octokit/rest';
 import axios from 'axios';
-
-const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
 
 export default async function handler(req, res) {
   const session = await getSession({ req });
-
-  console.log('session', session);
 
   if (!session) {
     return res.status(401).json({ message: 'Not authenticated' });
